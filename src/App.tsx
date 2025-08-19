@@ -22,7 +22,7 @@ const App: React.FC = () => {
 
   return (
     <div style={{ maxWidth: 800, margin: "40px auto", textAlign: "center" }}>
-      <h1 className="text-2xl font-bold mb-6">F1 Driver Standings</h1>
+      <h1 className="text-2xl font-bold mb-6">Formula 1 Driver Profiles</h1>
       <h2 className="text-2xl font-semibold mb-4">Click on a driver to learn more!</h2>
       {loading && <p>Loading…</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
