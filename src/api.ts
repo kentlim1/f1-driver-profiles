@@ -5,8 +5,10 @@ export interface DriverStanding {
     driverId: string;
     givenName: string;
     familyName: string;
+    nationality: string;
   };
   Constructors: {
+    constructorId: any;
     name: string;
   }[];
 }
