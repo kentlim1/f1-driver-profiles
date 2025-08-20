@@ -1,5 +1,8 @@
-import React from "react";
+import React from "react"; 
+import { useNavigate } from "react-router-dom";
 import type { DriverStanding } from "../api";
+import { Link } from "react-router-dom";
+
 
 // import driver images
 import verstappenImg from "../assets/drivers/verstappen.png";
@@ -36,10 +39,9 @@ import haasImg from "../assets/teams/haas.png";
 import sauberImg from "../assets/teams/kick.png";
 import alpineImg from "../assets/teams/alpine.png";
 
-// to do: import driver number logos
-
+// driver image map
 const driverImages: Record<string, string> = {
-  max_verstappen: verstappenImg, // api uses max_verstappen instead of just verstappen
+  max_verstappen: verstappenImg,
   hamilton: hamiltonImg,
   tsunoda: tsunodaImg,
   lawson: lawsonImg,
@@ -62,19 +64,19 @@ const driverImages: Record<string, string> = {
   bearman: bearmanImg
 };
 
+// team image map
 const teamImages: Record<string, string> = {
   mclaren: mclarenImg,
   ferrari: ferrariImg,
   mercedes: mercedesImg,
   red_bull: redbullImg,
   williams: williamsImg,
-  aston_martin: astonmartinImg, // update to better photo
+  aston_martin: astonmartinImg,
   rb: rbImg,    
-  sauber: sauberImg, // update to better photo
+  sauber: sauberImg,
   haas: haasImg,
   alpine: alpineImg,
 };
-
 
 const teamColors: Record<string, string> = {
   "Red Bull": "border-blue-900",
@@ -89,21 +91,23 @@ const teamColors: Record<string, string> = {
   "Alpine F1 Team": "border-pink-400",
 };
 
+// overrides (Yuki/Liam swap)
+const driverTeamOverride: Record<string, string> = {
+  tsunoda: "Red Bull",
+  lawson: "RB F1 Team",
+};
+
+const driverTeamOverrideId: Record<string, string> = {
+  tsunoda: "red_bull",
+  lawson: "rb",
+};
+
 type Props = {
   standing: DriverStanding;
 };
 
-const driverTeamOverride: Record<string, string> = {
-  tsunoda: "Red Bull", // Yuki Tsunoda → Red Bull
-  lawson: "RB F1 Team", // Liam Lawson → Racing Bulls
-};
-
-const driverTeamOverrideId: Record<string, string> = {
-  tsunoda: "red_bull", // Yuki Tsunoda → Red Bull
-  lawson: "rb",        // Liam Lawson → Racing Bulls
-};
-
 const DriverCard: React.FC<Props> = ({ standing }) => {
+  const navigate = useNavigate();
   const driver = standing.Driver;
   const driverId = driver.driverId.toLowerCase();
   const driverImgSrc = driverImages[driverId];
@@ -113,35 +117,35 @@ const DriverCard: React.FC<Props> = ({ standing }) => {
   const teamImgSrc = teamImages[constructorId];
 
   return (
-    <div className={`flex items-center justify-between border-4 ${borderColorClass} bg-[#242424] p-4 rounded-xl shadow-md w-300 h-40`}>
-        <div className="flex items-center">
-            {/* Driver image */}
-            <img
-            src={driverImgSrc}
-            alt={driver.familyName}
-            className="w-40 h-40 object-cover object-top border-gray-500"
-            />
-            
-            {/* Driver info + team image */}
-            <div className="flex items-center ml-4 space-x-4">
-            <div className="text-left text-white">
-                <p className="text-xl font-bold">
-                {driver.givenName} {driver.familyName}
-                </p>
-                <p className="text-med text-gray-200">{team}</p>
+    <div
+      onClick={() => navigate(`/${driverId}`)}
+      className={`flex items-center justify-start border-4 ${borderColorClass} bg-[#242424] p-4 rounded-xl shadow-md w-full h-40 cursor-pointer hover:scale-105 transition-transform`}
+    >
+        <Link to={`/driver/${driver.driverId}`}></Link>
+            <div className="flex items-center">
+                <img
+                src={driverImgSrc}
+                alt={driver.familyName}
+                className="w-40 h-40 object-cover object-top border-gray-500"
+                />
+                <div className="flex items-center ml-4 space-x-4">
+                <div className="text-left text-white">
+                    <p className="text-xl font-bold">
+                    {driver.givenName} {driver.familyName}
+                    </p>
+                    <p className="text-med text-gray-200">{team}</p>
+                </div>
+                <img
+                    src={teamImgSrc}
+                    alt={team}
+                    className="w-20 h-20 object-contain scale-80"
+                />
+                </div>
             </div>
-
-            {/* Team image */}
-            <img
-                src={teamImgSrc}
-                alt={team}
-                className="w-20 h-20 object-contain scale-80"
-            />
-        </div>
-    </div>
-      <div className="text-right text-white p-10">
-        <p className="text-lg font-bold">{standing.points} pts</p>
-      </div>
+            <div className="text-right text-white p-10 ml-auto">
+                <p className="text-lg font-bold">{standing.points} pts</p>
+            </div>
+        <Link to={`/driver/${driver.driverId}`}></Link>
     </div>
   );
 };
