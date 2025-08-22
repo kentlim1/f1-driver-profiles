@@ -83,7 +83,6 @@ useEffect(() => {
 
   (async () => {
     try {
-      // fetch the 2025 season schedule
       const scheduleRes = await fetch("https://api.jolpi.ca/ergast/f1/2025.json");
       const scheduleJson = await scheduleRes.json();
       const races = scheduleJson?.MRData?.RaceTable?.Races ?? [];
@@ -96,7 +95,7 @@ useEffect(() => {
         let roundPoints = 0;
         let position: number | null = null;
 
-        // --- Fetch normal GP results ---
+        // Fetch normal GP results
         const res = await fetch(
           `https://api.jolpi.ca/ergast/f1/2025/${race.round}/results.json`
         );
@@ -114,7 +113,7 @@ useEffect(() => {
           }
         }
 
-        // --- Fetch Sprint results (if exists) ---
+        // Fetch Sprint results (if exists) 
         const sprintRes = await fetch(
           `https://api.jolpi.ca/ergast/f1/2025/${race.round}/sprint.json`
         );
@@ -129,7 +128,7 @@ useEffect(() => {
           if (sprintResult) roundPoints += Number(sprintResult.points) || 0;
         }
 
-        // Only push if the round has happened (has results or sprint results)
+        // Only push if the round has happened
         if (roundPoints > 0 || raceData?.Results?.length) {
           cumulative += roundPoints;
           rows.push({

@@ -13,7 +13,7 @@ type PlacementRow = {
   round: number;
   race: string;
   position: number | null;
-  points?: number; // optional
+  points?: number;
 };
 
 type Props = {
@@ -61,7 +61,7 @@ const DriverPlacementChart: React.FC<Props> = ({ data }) => {
           <YAxis
             stroke="#ccc"
             domain={[1, "dataMax + 2"]}
-            reversed // so 1st is at the top
+            reversed // so P1 is at the top
             allowDecimals={false}
           />
           <Tooltip content={<CustomTooltip />} />
