@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import type { DriverStanding } from "../api";
+import DriverPointsChart from "../components/DriverPointsChart.tsx";
+import DriverPlacementChart from "../components/DriverPlacementChart.tsx";
 
 // import driver images
 import verstappenImg from "../assets/drivers/verstappen.png";
@@ -25,9 +27,20 @@ import strollImg from "../assets/drivers/stroll.png";
 import oconImg from "../assets/drivers/ocon.png";
 import bearmanImg from "../assets/drivers/bearman.png";
 
-
 type Props = {
   standings: DriverStanding[];
+};
+
+type ChartRow = {
+  round: number;
+  race: string;
+  points: number;
+};
+
+type PlacementRow = {
+  round: number;
+  race: string;
+  position: number;
 };
 
 const driverImages: Record<string, string> = {
@@ -51,15 +64,108 @@ const driverImages: Record<string, string> = {
   alonso: alonsoImg,
   stroll: strollImg,
   ocon: oconImg,
-  bearman: bearmanImg
+  bearman: bearmanImg,
 };
 
 const DriverPage: React.FC<Props> = ({ standings }) => {
   const { driverId } = useParams<{ driverId: string }>();
+  const [progression, setProgression] = useState<ChartRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [placementProgression, setPlacementProgression] = useState<PlacementRow[]>([]);
 
   const driverStanding = standings.find(
     (s) => s.Driver.driverId.toLowerCase() === driverId?.toLowerCase()
   );
+
+useEffect(() => {
+  if (!driverId) return;
+  let cancelled = false;
+
+  (async () => {
+    try {
+      // fetch the 2025 season schedule
+      const scheduleRes = await fetch("https://api.jolpi.ca/ergast/f1/2025.json");
+      const scheduleJson = await scheduleRes.json();
+      const races = scheduleJson?.MRData?.RaceTable?.Races ?? [];
+
+      let cumulative = 0;
+      const rows: ChartRow[] = [];
+      const placementRows: PlacementRow[] = [];
+
+      for (const race of races) {
+        let roundPoints = 0;
+        let position: number | null = null;
+
+        // --- Fetch normal GP results ---
+        const res = await fetch(
+          `https://api.jolpi.ca/ergast/f1/2025/${race.round}/results.json`
+        );
+        const json = await res.json();
+        const raceData = json?.MRData?.RaceTable?.Races?.[0];
+
+        if (raceData?.Results) {
+          const result = raceData.Results.find(
+            (r: any) =>
+              r?.Driver?.driverId?.toLowerCase() === driverId.toLowerCase()
+          );
+          if (result) {
+            roundPoints += Number(result.points) || 0;
+            position = Number(result.position) || null;
+          }
+        }
+
+        // --- Fetch Sprint results (if exists) ---
+        const sprintRes = await fetch(
+          `https://api.jolpi.ca/ergast/f1/2025/${race.round}/sprint.json`
+        );
+        const sprintJson = await sprintRes.json();
+        const sprintData = sprintJson?.MRData?.RaceTable?.Races?.[0];
+
+        if (sprintData?.SprintResults) {
+          const sprintResult = sprintData.SprintResults.find(
+            (r: any) =>
+              r?.Driver?.driverId?.toLowerCase() === driverId.toLowerCase()
+          );
+          if (sprintResult) roundPoints += Number(sprintResult.points) || 0;
+        }
+
+        // Only push if the round has happened (has results or sprint results)
+        if (roundPoints > 0 || raceData?.Results?.length) {
+          cumulative += roundPoints;
+          rows.push({
+            round: Number(race.round),
+            race: race.raceName,
+            points: cumulative,
+          } as ChartRow & { roundPoints: number });
+          placementRows.push({
+            round: Number(race.round),
+            race: race.raceName,
+            position: position ?? 0,
+            points: roundPoints,
+          } as PlacementRow );
+        }
+      }
+
+      if (!cancelled) {
+        setProgression(rows);
+        setPlacementProgression(placementRows);
+      }
+    } catch (e) {
+      console.error("Failed to fetch driver progression", e);
+      if (!cancelled) {
+        setProgression([]);
+        setPlacementProgression([]);
+      }
+    } finally {
+      if (!cancelled) setLoading(false);
+    }
+  })();
+
+  return () => {
+    cancelled = true;
+  };
+}, [driverId]);
+
 
   if (!driverStanding) {
     return (
@@ -73,8 +179,6 @@ const DriverPage: React.FC<Props> = ({ standings }) => {
   }
 
   const { Driver, Constructors, points } = driverStanding;
-
-  // get driver image, fallback to placeholder
   const driverImage = driverImages[Driver.driverId];
 
   return (
@@ -97,6 +201,29 @@ const DriverPage: React.FC<Props> = ({ standings }) => {
         Team: {Constructors[0]?.name ?? "N/A"}
       </p>
       <p className="text-lg text-gray-300">Points: {points}</p>
+
+      <div className="mt-10">
+    {loading ? (
+      <p>Loading chart…</p>
+    ) : progression.length > 0 ? (
+      <div className="flex flex-col md:flex-row gap-8 justify-center items-start">
+        <div className="flex-1 min-w-[450px] md:min-w-[600px]">
+          <DriverPointsChart
+            data={progression}
+            driverName={`${Driver.givenName} ${Driver.familyName}`}
+          />
+        </div>
+        <div className="flex-1 min-w-[450px] md:min-w-[600px]">
+          <DriverPlacementChart
+            data={placementProgression}
+            driverName={`${Driver.givenName} ${Driver.familyName}`}
+          />
+        </div>
+      </div>
+        ) : (
+          <p>No race data available.</p>
+        )}
+      </div>
     </div>
   );
 };
