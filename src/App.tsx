@@ -9,7 +9,6 @@ const App: React.FC = () => {
   const [standings, setStandings] = useState<DriverStanding[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const location = useLocation();
 
   useEffect(() => {
@@ -27,12 +26,14 @@ const App: React.FC = () => {
 
   return (
     <div style={{ maxWidth: 800, margin: "40px auto", textAlign: "center" }}>
-
       {/* Show subtitle only on homepage */}
       {location.pathname === "/" && (
-        <><h1 className="text-2xl font-bold mb-6">Formula 1 Driver Profiles</h1><h2 className="text-2xl font-semibold mb-4">
-          Click on a driver to learn more!
-        </h2></>
+        <>
+          <h1 className="text-2xl font-bold mb-6">Formula 1 Driver Profiles</h1>
+          <h2 className="text-2xl font-semibold mb-4">
+            Click on a driver to learn more!
+          </h2>
+        </>
       )}
 
       {loading && <p>Loading…</p>}
@@ -40,9 +41,12 @@ const App: React.FC = () => {
 
       <Routes>
         <Route path="/" element={<StandingsList standings={standings} />} />
-        <Route path="/:driverId" element={<DriverPage standings={standings} />} />
+        <Route
+          path="/:driverId"
+          element={<DriverPage standings={standings} />}
+        />
       </Routes>
-      <Analytics/>
+      <Analytics />
     </div>
   );
 };

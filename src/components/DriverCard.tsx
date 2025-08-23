@@ -1,8 +1,7 @@
-import React from "react"; 
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import type { DriverStanding } from "../api";
 import { Link } from "react-router-dom";
-
 
 // import driver images
 import verstappenImg from "../assets/drivers/verstappen.png";
@@ -61,7 +60,7 @@ const driverImages: Record<string, string> = {
   alonso: alonsoImg,
   stroll: strollImg,
   ocon: oconImg,
-  bearman: bearmanImg
+  bearman: bearmanImg,
 };
 
 // team image map
@@ -72,7 +71,7 @@ const teamImages: Record<string, string> = {
   red_bull: redbullImg,
   williams: williamsImg,
   aston_martin: astonmartinImg,
-  rb: rbImg,    
+  rb: rbImg,
   sauber: sauberImg,
   haas: haasImg,
   alpine: alpineImg,
@@ -83,11 +82,11 @@ const teamColors: Record<string, string> = {
   "Ferrari": "border-red-600",
   "McLaren": "border-orange-500",
   "Mercedes": "border-teal-500",
-  "Aston Martin": "border-green-800", 
-  "Williams": "border-blue-500", 
-  "RB F1 Team": "border-indigo-600",  
-  "Sauber": "border-green-500", 
-  "Haas F1 Team": "border-gray-500",  
+  "Aston Martin": "border-green-800",
+  "Williams": "border-blue-500",
+  "RB F1 Team": "border-indigo-600",
+  "Sauber": "border-green-500",
+  "Haas F1 Team": "border-gray-500",
   "Alpine F1 Team": "border-pink-400",
 };
 
@@ -113,7 +112,8 @@ const DriverCard: React.FC<Props> = ({ standing }) => {
   const driverImgSrc = driverImages[driverId];
   const team = driverTeamOverride[driverId] || standing.Constructors[0]?.name;
   const borderColorClass = teamColors[team];
-  const constructorId = driverTeamOverrideId[driverId] || standing.Constructors[0]?.constructorId;
+  const constructorId =
+    driverTeamOverrideId[driverId] || standing.Constructors[0]?.constructorId;
   const teamImgSrc = teamImages[constructorId];
 
   return (
@@ -121,31 +121,31 @@ const DriverCard: React.FC<Props> = ({ standing }) => {
       onClick={() => navigate(`/${driverId}`)}
       className={`flex items-center justify-start border-4 ${borderColorClass} bg-[#242424] p-4 rounded-xl shadow-md w-full h-40 cursor-pointer hover:scale-105 transition-transform`}
     >
-        <Link to={`/driver/${driver.driverId}`}></Link>
-            <div className="flex items-center">
-                <img
-                src={driverImgSrc}
-                alt={driver.familyName}
-                className="w-40 h-40 object-cover object-top border-gray-500"
-                />
-                <div className="flex items-center ml-4 space-x-4">
-                <div className="text-left text-white">
-                    <p className="text-xl font-bold">
-                    {driver.givenName} {driver.familyName}
-                    </p>
-                    <p className="text-med text-gray-200">{team}</p>
-                </div>
-                <img
-                    src={teamImgSrc}
-                    alt={team}
-                    className="w-20 h-20 object-contain scale-80"
-                />
-                </div>
-            </div>
-            <div className="text-right text-white p-10 ml-auto">
-                <p className="text-lg font-bold">{standing.points} pts</p>
-            </div>
-        <Link to={`/driver/${driver.driverId}`}></Link>
+      <Link to={`/driver/${driver.driverId}`}></Link>
+      <div className="flex items-center">
+        <img
+          src={driverImgSrc}
+          alt={driver.familyName}
+          className="w-40 h-40 object-cover object-top border-gray-500"
+        />
+        <div className="flex items-center ml-4 space-x-4">
+          <div className="text-left text-white">
+            <p className="text-xl font-bold">
+              {driver.givenName} {driver.familyName}
+            </p>
+            <p className="text-med text-gray-200">{team}</p>
+          </div>
+          <img
+            src={teamImgSrc}
+            alt={team}
+            className="w-20 h-20 object-contain scale-80"
+          />
+        </div>
+      </div>
+      <div className="text-right text-white p-10 ml-auto">
+        <p className="text-lg font-bold">{standing.points} pts</p>
+      </div>
+      <Link to={`/driver/${driver.driverId}`}></Link>
     </div>
   );
 };

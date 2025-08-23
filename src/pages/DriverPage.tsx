@@ -71,100 +71,103 @@ const DriverPage: React.FC<Props> = ({ standings }) => {
   const { driverId } = useParams<{ driverId: string }>();
   const [progression, setProgression] = useState<ChartRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [placementProgression, setPlacementProgression] = useState<PlacementRow[]>([]);
+  const [placementProgression, setPlacementProgression] = useState<
+    PlacementRow[]
+  >([]);
 
   const driverStanding = standings.find(
     (s) => s.Driver.driverId.toLowerCase() === driverId?.toLowerCase()
   );
 
-useEffect(() => {
-  if (!driverId) return;
-  let cancelled = false;
+  useEffect(() => {
+    if (!driverId) return;
+    let cancelled = false;
 
-  (async () => {
-    try {
-      const scheduleRes = await fetch("https://api.jolpi.ca/ergast/f1/2025.json");
-      const scheduleJson = await scheduleRes.json();
-      const races = scheduleJson?.MRData?.RaceTable?.Races ?? [];
-
-      let cumulative = 0;
-      const rows: ChartRow[] = [];
-      const placementRows: PlacementRow[] = [];
-
-      for (const race of races) {
-        let roundPoints = 0;
-        let position: number | null = null;
-
-        // Fetch normal GP results
-        const res = await fetch(
-          `https://api.jolpi.ca/ergast/f1/2025/${race.round}/results.json`
+    (async () => {
+      try {
+        const scheduleRes = await fetch(
+          "https://api.jolpi.ca/ergast/f1/2025.json"
         );
-        const json = await res.json();
-        const raceData = json?.MRData?.RaceTable?.Races?.[0];
+        const scheduleJson = await scheduleRes.json();
+        const races = scheduleJson?.MRData?.RaceTable?.Races ?? [];
 
-        if (raceData?.Results) {
-          const result = raceData.Results.find(
-            (r: any) =>
-              r?.Driver?.driverId?.toLowerCase() === driverId.toLowerCase()
+        let cumulative = 0;
+        const rows: ChartRow[] = [];
+        const placementRows: PlacementRow[] = [];
+
+        for (const race of races) {
+          let roundPoints = 0;
+          let position: number | null = null;
+
+          // Fetch normal GP results
+          const res = await fetch(
+            `https://api.jolpi.ca/ergast/f1/2025/${race.round}/results.json`
           );
-          if (result) {
-            roundPoints += Number(result.points) || 0;
-            position = Number(result.position) || null;
+          const json = await res.json();
+          const raceData = json?.MRData?.RaceTable?.Races?.[0];
+
+          if (raceData?.Results) {
+            const result = raceData.Results.find(
+              (r: any) =>
+                r?.Driver?.driverId?.toLowerCase() === driverId.toLowerCase()
+            );
+            if (result) {
+              roundPoints += Number(result.points) || 0;
+              position = Number(result.position) || null;
+            }
+          }
+
+          // Fetch Sprint results (if exists)
+          const sprintRes = await fetch(
+            `https://api.jolpi.ca/ergast/f1/2025/${race.round}/sprint.json`
+          );
+          const sprintJson = await sprintRes.json();
+          const sprintData = sprintJson?.MRData?.RaceTable?.Races?.[0];
+
+          if (sprintData?.SprintResults) {
+            const sprintResult = sprintData.SprintResults.find(
+              (r: any) =>
+                r?.Driver?.driverId?.toLowerCase() === driverId.toLowerCase()
+            );
+            if (sprintResult) roundPoints += Number(sprintResult.points) || 0;
+          }
+
+          // Only push if the round has happened
+          if (roundPoints > 0 || raceData?.Results?.length) {
+            cumulative += roundPoints;
+            rows.push({
+              round: Number(race.round),
+              race: race.raceName,
+              points: cumulative,
+            } as ChartRow & { roundPoints: number });
+            placementRows.push({
+              round: Number(race.round),
+              race: race.raceName,
+              position: position ?? 0,
+              points: roundPoints,
+            } as PlacementRow);
           }
         }
 
-        // Fetch Sprint results (if exists) 
-        const sprintRes = await fetch(
-          `https://api.jolpi.ca/ergast/f1/2025/${race.round}/sprint.json`
-        );
-        const sprintJson = await sprintRes.json();
-        const sprintData = sprintJson?.MRData?.RaceTable?.Races?.[0];
-
-        if (sprintData?.SprintResults) {
-          const sprintResult = sprintData.SprintResults.find(
-            (r: any) =>
-              r?.Driver?.driverId?.toLowerCase() === driverId.toLowerCase()
-          );
-          if (sprintResult) roundPoints += Number(sprintResult.points) || 0;
+        if (!cancelled) {
+          setProgression(rows);
+          setPlacementProgression(placementRows);
         }
-
-        // Only push if the round has happened
-        if (roundPoints > 0 || raceData?.Results?.length) {
-          cumulative += roundPoints;
-          rows.push({
-            round: Number(race.round),
-            race: race.raceName,
-            points: cumulative,
-          } as ChartRow & { roundPoints: number });
-          placementRows.push({
-            round: Number(race.round),
-            race: race.raceName,
-            position: position ?? 0,
-            points: roundPoints,
-          } as PlacementRow );
+      } catch (e) {
+        console.error("Failed to fetch driver progression", e);
+        if (!cancelled) {
+          setProgression([]);
+          setPlacementProgression([]);
         }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
+    })();
 
-      if (!cancelled) {
-        setProgression(rows);
-        setPlacementProgression(placementRows);
-      }
-    } catch (e) {
-      console.error("Failed to fetch driver progression", e);
-      if (!cancelled) {
-        setProgression([]);
-        setPlacementProgression([]);
-      }
-    } finally {
-      if (!cancelled) setLoading(false);
-    }
-  })();
-
-  return () => {
-    cancelled = true;
-  };
-}, [driverId]);
-
+    return () => {
+      cancelled = true;
+    };
+  }, [driverId]);
 
   if (!driverStanding) {
     return (
@@ -202,23 +205,23 @@ useEffect(() => {
       <p className="text-lg text-gray-300">Points: {points}</p>
 
       <div className="mt-10">
-    {loading ? (
-      <p>Loading chart…</p>
-    ) : progression.length > 0 ? (
-      <div className="flex flex-col md:flex-row gap-8 justify-center items-start">
-        <div className="flex-1 min-w-[450px] md:min-w-[600px]">
-          <DriverPointsChart
-            data={progression}
-            driverName={`${Driver.givenName} ${Driver.familyName}`}
-          />
-        </div>
-        <div className="flex-1 min-w-[450px] md:min-w-[600px]">
-          <DriverPlacementChart
-            data={placementProgression}
-            driverName={`${Driver.givenName} ${Driver.familyName}`}
-          />
-        </div>
-      </div>
+        {loading ? (
+          <p>Loading chart…</p>
+        ) : progression.length > 0 ? (
+          <div className="flex flex-col md:flex-row gap-8 justify-center items-start">
+            <div className="flex-1 min-w-[450px] md:min-w-[600px]">
+              <DriverPointsChart
+                data={progression}
+                driverName={`${Driver.givenName} ${Driver.familyName}`}
+              />
+            </div>
+            <div className="flex-1 min-w-[450px] md:min-w-[600px]">
+              <DriverPlacementChart
+                data={placementProgression}
+                driverName={`${Driver.givenName} ${Driver.familyName}`}
+              />
+            </div>
+          </div>
         ) : (
           <p>No race data available.</p>
         )}

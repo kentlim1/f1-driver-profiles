@@ -23,10 +23,12 @@ export interface StandingsResponse {
   };
 }
 
-export async function fetchDriverStandings(season = 'current'): Promise<DriverStanding[]> {
+export async function fetchDriverStandings(
+  season = "current"
+): Promise<DriverStanding[]> {
   const url = `https://api.jolpi.ca/ergast/f1/${season}/driverstandings/`;
   const res = await fetch(url);
-  if (!res.ok) throw new Error('Failed to fetch standings');
+  if (!res.ok) throw new Error("Failed to fetch standings");
   const data: StandingsResponse = await res.json();
   return data.MRData.StandingsTable.StandingsLists[0]?.DriverStandings || [];
 }
@@ -40,7 +42,9 @@ export async function fetchDriverProgression(
   year: string,
   driverId: string
 ): Promise<RacePoints[]> {
-  const response = await fetch(`https://api.jolpi.ca/ergast/f1/${year}/results`);
+  const response = await fetch(
+    `https://api.jolpi.ca/ergast/f1/${year}/results`
+  );
   if (!response.ok) throw new Error("Failed to fetch race results");
   const results = await response.json();
 
@@ -63,4 +67,3 @@ export async function fetchDriverProgression(
 
   return progression;
 }
-
