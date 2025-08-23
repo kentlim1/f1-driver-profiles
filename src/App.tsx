@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next"
 import React, { useEffect, useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { fetchDriverStandings, type DriverStanding } from "./api";
@@ -41,6 +42,7 @@ const App: React.FC = () => {
         <Route path="/" element={<StandingsList standings={standings} />} />
         <Route path="/:driverId" element={<DriverPage standings={standings} />} />
       </Routes>
+      <Analytics/>
     </div>
   );
 };
