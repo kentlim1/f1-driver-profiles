@@ -7,6 +7,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Label,
 } from "recharts";
 
 type PlacementRow = {
@@ -31,16 +32,34 @@ const CustomTooltip = ({
   if (active && payload && payload.length) {
     const row = payload[0].payload;
     return (
-      <div style={{ background: "#242424", borderRadius: 8, padding: 10, color: "#fff" }}>
-        <div><strong>Round {row.round}: {row.race}</strong></div>
+      <div
+        style={{
+          background: "#242424",
+          borderRadius: 8,
+          padding: 10,
+          color: "#fff",
+        }}
+      >
         <div>
-          {row.status
-            ? <span>Status: <strong>{row.status}</strong></span>
-            : <span>Position: <strong>P{row.position}</strong></span>
-          }
+          <strong>
+            Round {row.round}: {row.race}
+          </strong>
+        </div>
+        <div>
+          {row.status ? (
+            <span>
+              Status: <strong>{row.status}</strong>
+            </span>
+          ) : (
+            <span>
+              Position: <strong>P{row.position}</strong>
+            </span>
+          )}
         </div>
         {row.points !== undefined && (
-          <div>Points: <strong>{row.points}</strong></div>
+          <div>
+            Points: <strong>{row.points}</strong>
+          </div>
         )}
       </div>
     );
@@ -50,20 +69,30 @@ const CustomTooltip = ({
 
 const DriverPlacementChart: React.FC<Props> = ({ data }) => {
   return (
-    <div className="bg-[#242424] p-4 rounded-2xl shadow-lg">
+    <div className="bg-[#242424] p-4 rounded-2xl">
       <h2 className="text-xl font-bold mb-4 text-white text-center">
         Race Finishing Positions
       </h2>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#555" />
-          <XAxis dataKey="round" stroke="#ccc" />
+          <XAxis dataKey="round" stroke="#ccc">
+            <Label value="Round" offset={-5} position="insideBottom" fill="#ccc" />
+          </XAxis>
           <YAxis
             stroke="#ccc"
             domain={[1, "dataMax + 2"]}
-            reversed // so P1 is at the top
+            reversed
             allowDecimals={false}
-          />
+          >
+            <Label
+              value="Placement"
+              angle={-90}
+              position="insideLeft"
+              style={{ textAnchor: "middle" }}
+              fill="#ccc"
+            />
+          </YAxis>
           <Tooltip content={<CustomTooltip />} />
           <Line
             type="monotone"
