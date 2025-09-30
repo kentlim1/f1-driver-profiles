@@ -7,6 +7,7 @@
   font-weight: 400;
 
   color-scheme: light dark;
+  --color-primary-gradient: linear-gradient(90deg, #ff1801, #ffa500);
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 
@@ -15,11 +16,40 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+html {
+  scroll-behavior: smooth;
+}
 
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: radial-gradient(circle at 20% 20%, #1e1e1e, #0e0e0e);
+  color: rgba(255, 255, 255, 0.9);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  animation: fadeIn 0.8s ease-in-out;
+}
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  font-size: 3rem;
+  line-height: 1;
+  text-align: center;
+  margin-bottom: 1rem;
+  background: var(--color-primary-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
