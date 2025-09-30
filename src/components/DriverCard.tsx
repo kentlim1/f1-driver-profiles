@@ -119,7 +119,7 @@ const DriverCard: React.FC<Props> = ({ standing }) => {
   return (
     <div
       onClick={() => navigate(`/${driverId}`)}
-      className={`flex items-center justify-start border-4 ${borderColorClass} bg-[#242424] p-4 rounded-xl shadow-md w-full h-40 cursor-pointer hover:scale-105 transition-transform`}
+      className={`flex items-center justify-start border-4 ${borderColorClass} bg-[#242424] p-4 rounded-xl shadow-xl/40 w-full h-40 cursor-pointer hover:scale-105 transition-transform`}
     >
       <Link to={`/driver/${driver.driverId}`}></Link>
       <div className="flex items-center">
