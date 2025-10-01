@@ -47,6 +47,11 @@ const App: React.FC = () => {
         />
       </Routes>
       <Analytics />
+      <footer> 
+        <p className="text-sm text-gray-500 mt-8">
+          Made with React by Kent Lim
+        </p>
+      </footer>
     </div>
   );
 };
