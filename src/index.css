@@ -34,7 +34,6 @@ body {
 h1 {
   font-size: 3rem;
   line-height: 1.2;
-  text-align: center;
   margin-bottom: 1rem;
   background: var(--color-primary-gradient);
   background-clip: text;
