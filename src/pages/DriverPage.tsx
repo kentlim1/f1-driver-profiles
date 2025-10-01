@@ -206,7 +206,10 @@ const DriverPage: React.FC<Props> = ({ standings }) => {
 
       <div className="mt-10">
         {loading ? (
-          <p>Loading chart…</p>
+          <p className="flex space-x-2 text-align-center justify-center">
+            <span className="animate-spin h-5 w-5 border-2 border-t-transparent border-white rounded-full"></span>
+            <span>Loading chart…</span>
+          </p>
         ) : progression.length > 0 ? (
           <div className="flex flex-col md:flex-row gap-8 justify-center items-start">
             <div className="flex-1 min-w-[450px] md:min-w-[600px]">
