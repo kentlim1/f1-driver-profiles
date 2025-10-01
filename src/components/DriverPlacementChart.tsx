@@ -69,7 +69,7 @@ const CustomTooltip = ({
 
 const DriverPlacementChart: React.FC<Props> = ({ data }) => {
   return (
-    <div className="bg-[#242424] p-4 rounded-2xl">
+    <div className="bg-[#242424] p-4 rounded-2xl shadow-xl/70 hover:scale-[1.02] transition-transform duration-300">
       <h2 className="text-xl font-bold mb-4 text-white text-center">
         Race Finishing Positions
       </h2>
