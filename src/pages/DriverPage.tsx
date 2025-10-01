@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import type { DriverStanding } from "../api";
 import DriverPointsChart from "../components/DriverPointsChart.tsx";
 import DriverPlacementChart from "../components/DriverPlacementChart.tsx";
+import driverDescriptions from "../data/driverDescriptions.json";
 
 // import driver images
 import verstappenImg from "../assets/drivers/verstappen.png";
@@ -182,31 +183,39 @@ const DriverPage: React.FC<Props> = ({ standings }) => {
 
   const { Driver, Constructors, points } = driverStanding;
   const driverImage = driverImages[Driver.driverId];
+  const typedDriverId = Driver.driverId as keyof typeof driverDescriptions;
+  const description = driverDescriptions[typedDriverId] || "No description available.";
+
 
   return (
-    <div className="p-6 text-white text-center">
+    <div className="p-3 md:p-0 text-white">
       <Link to="/" className="text-blue-400 underline block mb-4 text-left">
         ← Back to standings
       </Link>
-
-      <img
-        src={driverImage}
-        alt={`${Driver.givenName} ${Driver.familyName}`}
-        className="w-48 h-48 mx-auto rounded-full object-top border-4 border-gray-700 mb-4 object-cover"
-      />
-
-      <h1 className="text-3xl font-bold mt-2">
-        {Driver.givenName} {Driver.familyName}
-      </h1>
-      <p className="text-lg text-gray-300">Nationality: {Driver.nationality}</p>
-      <p className="text-lg text-gray-300">
-        Team: {Constructors[0]?.name ?? "N/A"}
-      </p>
-      <p className="text-lg text-gray-300">Points: {points}</p>
-
+      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6">
+        <div className="flex flex-col items-center text-center md:items-start md:text-left">
+          <img
+            src={driverImage}
+            alt={`${Driver.givenName} ${Driver.familyName}`}
+            className="w-48 h-48 rounded-full object-top border-4 border-gray-700 mb-4 object-cover"
+          />
+          <h1 className="text-3xl font-bold">
+            {Driver.givenName} {Driver.familyName}
+          </h1>
+          <p className="text-lg text-gray-300">Nationality: {Driver.nationality}</p>
+          <p className="text-lg text-gray-300">
+            Team: {Constructors[0]?.name ?? "N/A"}
+          </p>
+          <p className="text-lg text-gray-300">Points: {points}</p>
+        </div>
+        <div className="md:w-1/2 text-white md:pl-20">
+          <h2 className="text-4xl font-semibold mb-2 underline">Driver Overview</h2>
+          <p className="text-lg leading-relaxed">{description}</p>
+        </div>
+      </div>
       <div className="mt-10">
         {loading ? (
-          <p className="flex space-x-2 text-align-center justify-center">
+          <p className="flex space-x-2 justify-center">
             <span className="animate-spin h-5 w-5 border-2 border-t-transparent border-white rounded-full"></span>
             <span>Loading chart…</span>
           </p>
@@ -231,6 +240,6 @@ const DriverPage: React.FC<Props> = ({ standings }) => {
       </div>
     </div>
   );
-};
+}
 
 export default DriverPage;
