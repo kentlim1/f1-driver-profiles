@@ -6,6 +6,4 @@ I used the [Jolpica F1 API](https://api.jolpi.ca/ergast/ "Jolpica F1 API") ([Git
 
 ## TO DO:
 
-- fix charts on phone
-- small bio for each driver
 - something for backend
