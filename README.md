@@ -6,5 +6,4 @@ I used the [Jolpica F1 API](https://api.jolpi.ca/ergast/ "Jolpica F1 API") ([Git
 
 ## TO DO:
 
-- real-time activity feed (good for live race reactions from the community, supabase?)
-- set up user accounts to accompany the above feature (OAuth 2.0?)
+- real-time activity feed (good for live race reactions from the community, coming soon)
