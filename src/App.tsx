@@ -1,3 +1,7 @@
+import LoginPage from "./pages/LoginPage";
+import AuthButton from "./components/AuthButton";
+import UsernamePage from "./pages/UsernamePage";
+import UsernameGate from "./components/UsernameGate";
 import { Analytics } from "@vercel/analytics/react";
 import React, { useEffect, useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
@@ -26,6 +30,8 @@ const App: React.FC = () => {
 
   return (
     <div style={{ maxWidth: 800, margin: "40px auto", textAlign: "center" }}>
+      <UsernameGate />
+      <AuthButton />
       {/* Show subtitle only on homepage */}
       {location.pathname === "/" && (
         <>
@@ -41,10 +47,9 @@ const App: React.FC = () => {
 
       <Routes>
         <Route path="/" element={<StandingsList standings={standings} />} />
-        <Route
-          path="/:driverId"
-          element={<DriverPage standings={standings} />}
-        />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/:driverId" element={<DriverPage standings={standings} />} />
+        <Route path="/username" element={<UsernamePage />} />
       </Routes>
       <Analytics />
       <footer> 
