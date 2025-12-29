@@ -6,6 +6,5 @@ I used the [Jolpica F1 API](https://api.jolpi.ca/ergast/ "Jolpica F1 API") ([Git
 
 ## TO DO:
 
-- fix charts on phone
-- small bio for each driver
-- something for backend
+- real-time activity feed (good for live race reactions from the community, supabase?)
+- set up user accounts to accompany the above feature (OAuth 2.0?)
