@@ -104,7 +104,7 @@ export default function LoginPage() {
           </h2>
           <p className="mt-2 text-sm text-white/70">
             {mode === "signin"
-              ? "Sign in to personalize your experience."
+              ? "Sign in to interact with the community on race days (coming soon!)"
               : "Sign up with your email and password."}
           </p>
         </div>
