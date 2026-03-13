@@ -24,9 +24,8 @@ export interface StandingsResponse {
 }
 
 export async function fetchDriverStandings(
-  season = "current"
 ): Promise<DriverStanding[]> {
-  const url = `https://api.jolpi.ca/ergast/f1/${season}/driverstandings/`;
+  const url = `https://api.jolpi.ca/ergast/f1/2026/driverstandings/`;
   const res = await fetch(url);
   if (!res.ok) throw new Error("Failed to fetch standings");
   const data: StandingsResponse = await res.json();
@@ -39,11 +38,10 @@ export type RacePoints = {
 };
 
 export async function fetchDriverProgression(
-  year: string,
   driverId: string
 ): Promise<RacePoints[]> {
   const response = await fetch(
-    `https://api.jolpi.ca/ergast/f1/${year}/results`
+    `https://api.jolpi.ca/ergast/f1/2026/results`
   );
   if (!response.ok) throw new Error("Failed to fetch race results");
   const results = await response.json();

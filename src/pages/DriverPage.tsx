@@ -22,11 +22,13 @@ import bortoletoImg from "../assets/drivers/bortoleto.png";
 import hulkenbergImg from "../assets/drivers/hulkenberg.png";
 import gaslyImg from "../assets/drivers/gasly.png";
 import colapintoImg from "../assets/drivers/colapinto.png";
-import doohanImg from "../assets/drivers/doohan.png";
 import alonsoImg from "../assets/drivers/alonso.png";
 import strollImg from "../assets/drivers/stroll.png";
 import oconImg from "../assets/drivers/ocon.png";
 import bearmanImg from "../assets/drivers/bearman.png";
+import lindbladImg from "../assets/drivers/lindblad.png";
+import perezImg from "../assets/drivers/perez.png";
+import bottasImg from "../assets/drivers/bottas.png";
 
 type Props = {
   standings: DriverStanding[];
@@ -61,11 +63,14 @@ const driverImages: Record<string, string> = {
   hulkenberg: hulkenbergImg,
   gasly: gaslyImg,
   colapinto: colapintoImg,
-  doohan: doohanImg,
   alonso: alonsoImg,
   stroll: strollImg,
   ocon: oconImg,
   bearman: bearmanImg,
+  lindblad: lindbladImg,
+  arvid_lindblad: lindbladImg,
+  perez: perezImg,
+  bottas: bottasImg
 };
 
 const DriverPage: React.FC<Props> = ({ standings }) => {
@@ -87,7 +92,7 @@ const DriverPage: React.FC<Props> = ({ standings }) => {
     (async () => {
       try {
         const scheduleRes = await fetch(
-          "https://api.jolpi.ca/ergast/f1/2025.json"
+          "https://api.jolpi.ca/ergast/f1/2026.json"
         );
         const scheduleJson = await scheduleRes.json();
         const races = scheduleJson?.MRData?.RaceTable?.Races ?? [];
@@ -102,7 +107,7 @@ const DriverPage: React.FC<Props> = ({ standings }) => {
 
           // Fetch normal GP results
           const res = await fetch(
-            `https://api.jolpi.ca/ergast/f1/2025/${race.round}/results.json`
+            `https://api.jolpi.ca/ergast/f1/2026/${race.round}/results.json`
           );
           const json = await res.json();
           const raceData = json?.MRData?.RaceTable?.Races?.[0];
@@ -120,7 +125,7 @@ const DriverPage: React.FC<Props> = ({ standings }) => {
 
           // Fetch Sprint results (if exists)
           const sprintRes = await fetch(
-            `https://api.jolpi.ca/ergast/f1/2025/${race.round}/sprint.json`
+            `https://api.jolpi.ca/ergast/f1/2026/${race.round}/sprint.json`
           );
           const sprintJson = await sprintRes.json();
           const sprintData = sprintJson?.MRData?.RaceTable?.Races?.[0];

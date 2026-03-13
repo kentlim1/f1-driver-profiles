@@ -18,7 +18,7 @@ const App: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const data = await fetchDriverStandings("2025");
+        const data = await fetchDriverStandings();
         setStandings(data);
       } catch {
         setError("Failed to load profiles.");

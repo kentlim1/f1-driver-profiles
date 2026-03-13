@@ -20,11 +20,14 @@ import bortoletoImg from "../assets/drivers/bortoleto.png";
 import hulkenbergImg from "../assets/drivers/hulkenberg.png";
 import gaslyImg from "../assets/drivers/gasly.png";
 import colapintoImg from "../assets/drivers/colapinto.png";
-import doohanImg from "../assets/drivers/doohan.png";
 import alonsoImg from "../assets/drivers/alonso.png";
 import strollImg from "../assets/drivers/stroll.png";
 import oconImg from "../assets/drivers/ocon.png";
 import bearmanImg from "../assets/drivers/bearman.png";
+import lindbladImg from "../assets/drivers/lindblad.png";
+import perezImg from "../assets/drivers/perez.png";
+import bottasImg from "../assets/drivers/bottas.png";
+
 
 // import team images
 import mclarenImg from "../assets/teams/mclaren.png";
@@ -35,8 +38,9 @@ import williamsImg from "../assets/teams/williams.png";
 import rbImg from "../assets/teams/rb.png";
 import astonmartinImg from "../assets/teams/aston-martin.png";
 import haasImg from "../assets/teams/haas.png";
-import sauberImg from "../assets/teams/kick.png";
+import audiImg from "../assets/teams/audi.png";
 import alpineImg from "../assets/teams/alpine.png";
+import cadillacImg from "../assets/teams/cadillac.png"
 
 // driver image map
 const driverImages: Record<string, string> = {
@@ -56,11 +60,14 @@ const driverImages: Record<string, string> = {
   hulkenberg: hulkenbergImg,
   gasly: gaslyImg,
   colapinto: colapintoImg,
-  doohan: doohanImg,
   alonso: alonsoImg,
   stroll: strollImg,
   ocon: oconImg,
   bearman: bearmanImg,
+  lindblad: lindbladImg,
+  arvid_lindblad: lindbladImg,
+  perez: perezImg,
+  bottas: bottasImg
 };
 
 // team image map
@@ -72,9 +79,10 @@ const teamImages: Record<string, string> = {
   williams: williamsImg,
   aston_martin: astonmartinImg,
   rb: rbImg,
-  sauber: sauberImg,
+  audi: audiImg,
   haas: haasImg,
   alpine: alpineImg,
+  cadillac: cadillacImg
 };
 
 const teamColors: Record<string, string> = {
