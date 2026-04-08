@@ -72,7 +72,7 @@ export default function LoginPage() {
       <div className="min-h-[70vh] grid place-items-center px-6">
         <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl backdrop-blur">
           <div className="text-center">
-            <h2 className="text-2xl font-extrabold tracking-tight">You’re logged in ✅</h2>
+            <h2 className="text-2xl font-extrabold tracking-tight">You’re signed in</h2>
             <p className="mt-2 text-sm text-white/70">{session.user.email}</p>
           </div>
 

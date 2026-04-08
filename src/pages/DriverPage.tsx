@@ -4,31 +4,13 @@ import type { DriverStanding } from "../api";
 import DriverPointsChart from "../components/DriverPointsChart.tsx";
 import DriverPlacementChart from "../components/DriverPlacementChart.tsx";
 import driverDescriptions from "../data/driverDescriptions.json";
-
-// import driver images
-import verstappenImg from "../assets/drivers/verstappen.png";
-import hamiltonImg from "../assets/drivers/hamilton.png";
-import tsunodaImg from "../assets/drivers/tsunoda.png";
-import lawsonImg from "../assets/drivers/lawson.png";
-import leclercImg from "../assets/drivers/leclerc.png";
-import norrisImg from "../assets/drivers/norris.png";
-import piastriImg from "../assets/drivers/piastri.png";
-import albonImg from "../assets/drivers/albon.png";
-import sainzImg from "../assets/drivers/sainz.png";
-import russellImg from "../assets/drivers/russell.png";
-import antonelliImg from "../assets/drivers/antonelli.png";
-import hadjarImg from "../assets/drivers/hadjar.png";
-import bortoletoImg from "../assets/drivers/bortoleto.png";
-import hulkenbergImg from "../assets/drivers/hulkenberg.png";
-import gaslyImg from "../assets/drivers/gasly.png";
-import colapintoImg from "../assets/drivers/colapinto.png";
-import alonsoImg from "../assets/drivers/alonso.png";
-import strollImg from "../assets/drivers/stroll.png";
-import oconImg from "../assets/drivers/ocon.png";
-import bearmanImg from "../assets/drivers/bearman.png";
-import lindbladImg from "../assets/drivers/lindblad.png";
-import perezImg from "../assets/drivers/perez.png";
-import bottasImg from "../assets/drivers/bottas.png";
+import {
+  driverImages,
+  teamImages,
+  getTeamName,
+  getTeamColor,
+  getConstructorId,
+} from "../lib/constants";
 
 type Props = {
   standings: DriverStanding[];
@@ -46,40 +28,11 @@ type PlacementRow = {
   position: number;
 };
 
-const driverImages: Record<string, string> = {
-  max_verstappen: verstappenImg,
-  hamilton: hamiltonImg,
-  tsunoda: tsunodaImg,
-  lawson: lawsonImg,
-  leclerc: leclercImg,
-  norris: norrisImg,
-  piastri: piastriImg,
-  albon: albonImg,
-  sainz: sainzImg,
-  russell: russellImg,
-  antonelli: antonelliImg,
-  hadjar: hadjarImg,
-  bortoleto: bortoletoImg,
-  hulkenberg: hulkenbergImg,
-  gasly: gaslyImg,
-  colapinto: colapintoImg,
-  alonso: alonsoImg,
-  stroll: strollImg,
-  ocon: oconImg,
-  bearman: bearmanImg,
-  lindblad: lindbladImg,
-  arvid_lindblad: lindbladImg,
-  perez: perezImg,
-  bottas: bottasImg
-};
-
 const DriverPage: React.FC<Props> = ({ standings }) => {
   const { driverId } = useParams<{ driverId: string }>();
   const [progression, setProgression] = useState<ChartRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [placementProgression, setPlacementProgression] = useState<
-    PlacementRow[]
-  >([]);
+  const [placementProgression, setPlacementProgression] = useState<PlacementRow[]>([]);
 
   const driverStanding = standings.find(
     (s) => s.Driver.driverId.toLowerCase() === driverId?.toLowerCase()
@@ -91,9 +44,7 @@ const DriverPage: React.FC<Props> = ({ standings }) => {
 
     (async () => {
       try {
-        const scheduleRes = await fetch(
-          "https://api.jolpi.ca/ergast/f1/2026.json"
-        );
+        const scheduleRes = await fetch("https://api.jolpi.ca/ergast/f1/2026.json");
         const scheduleJson = await scheduleRes.json();
         const races = scheduleJson?.MRData?.RaceTable?.Races ?? [];
 
@@ -105,7 +56,6 @@ const DriverPage: React.FC<Props> = ({ standings }) => {
           let roundPoints = 0;
           let position: number | null = null;
 
-          // Fetch normal GP results
           const res = await fetch(
             `https://api.jolpi.ca/ergast/f1/2026/${race.round}/results.json`
           );
@@ -114,8 +64,7 @@ const DriverPage: React.FC<Props> = ({ standings }) => {
 
           if (raceData?.Results) {
             const result = raceData.Results.find(
-              (r: any) =>
-                r?.Driver?.driverId?.toLowerCase() === driverId.toLowerCase()
+              (r: any) => r?.Driver?.driverId?.toLowerCase() === driverId.toLowerCase()
             );
             if (result) {
               roundPoints += Number(result.points) || 0;
@@ -123,7 +72,6 @@ const DriverPage: React.FC<Props> = ({ standings }) => {
             }
           }
 
-          // Fetch Sprint results (if exists)
           const sprintRes = await fetch(
             `https://api.jolpi.ca/ergast/f1/2026/${race.round}/sprint.json`
           );
@@ -132,13 +80,11 @@ const DriverPage: React.FC<Props> = ({ standings }) => {
 
           if (sprintData?.SprintResults) {
             const sprintResult = sprintData.SprintResults.find(
-              (r: any) =>
-                r?.Driver?.driverId?.toLowerCase() === driverId.toLowerCase()
+              (r: any) => r?.Driver?.driverId?.toLowerCase() === driverId.toLowerCase()
             );
             if (sprintResult) roundPoints += Number(sprintResult.points) || 0;
           }
 
-          // Only push if the round has happened
           if (roundPoints > 0 || raceData?.Results?.length) {
             cumulative += roundPoints;
             rows.push({
@@ -170,79 +116,210 @@ const DriverPage: React.FC<Props> = ({ standings }) => {
       }
     })();
 
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [driverId]);
 
   if (!driverStanding) {
     return (
       <div className="p-6 text-white">
         <p>Driver not found.</p>
-        <Link to="/" className="text-blue-400 underline">
-          Back to standings
+        <Link to="/" className="text-red-400 hover:text-white transition-colors">
+          ← Back to standings
         </Link>
       </div>
     );
   }
 
-  const { Driver, Constructors, points } = driverStanding;
+  const { Driver, Constructors, points, position } = driverStanding;
   const driverImage = driverImages[Driver.driverId];
   const typedDriverId = Driver.driverId as keyof typeof driverDescriptions;
   const description = driverDescriptions[typedDriverId] || "No description available.";
 
+  const teamName = getTeamName(Driver.driverId, Constructors[0]?.name);
+  const teamColor = getTeamColor(teamName);
+  const constructorId = getConstructorId(Driver.driverId, Constructors[0]?.constructorId);
+  const teamImg = teamImages[constructorId];
+
+  // Calculate stats from progression data
+  const bestFinish = placementProgression.length > 0
+    ? Math.min(...placementProgression.filter(p => p.position > 0).map(p => p.position))
+    : null;
+  const racesCompleted = placementProgression.length;
+  const podiums = placementProgression.filter(p => p.position >= 1 && p.position <= 3).length;
 
   return (
-    <div className="p-3 md:p-0 text-white">
-      <Link to="/" className="text-blue-400 underline block mb-4 text-left">
-        ← Back to standings
+    <div className="text-white max-w-6xl mx-auto">
+      {/* Back button */}
+      <Link
+        to="/"
+        className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-white transition-colors mb-6 group"
+      >
+        <svg
+          className="h-4 w-4 group-hover:-translate-x-1 transition-transform"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to standings
       </Link>
-      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6">
-        <div className="flex flex-col items-center text-center md:items-start md:text-left">
-          <img
-            src={driverImage}
-            alt={`${Driver.givenName} ${Driver.familyName}`}
-            className="w-48 h-48 rounded-full object-top border-4 border-gray-700 mb-4 object-cover"
-          />
-          <h1 className="text-3xl font-bold">
-            {Driver.givenName} {Driver.familyName}
-          </h1>
-          <p className="text-lg text-gray-300">Nationality: {Driver.nationality}</p>
-          <p className="text-lg text-gray-300">
-            Team: {Constructors[0]?.name ?? "N/A"}
-          </p>
-          <p className="text-lg text-gray-300">Points: {points}</p>
-        </div>
-        <div className="md:w-1/2 text-white md:pl-20">
-          <h2 className="text-4xl font-semibold mb-2 underline">Driver Overview</h2>
-          <p className="text-lg leading-relaxed">{description}</p>
+
+      {/* Hero Section */}
+      <div className="relative rounded-2xl overflow-hidden border border-white/10 mb-8">
+        {/* Gradient background */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(135deg, ${teamColor}25, transparent 50%, ${teamColor}08)`,
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-transparent to-transparent" />
+
+        <div className="relative flex flex-col md:flex-row">
+          {/* Driver image */}
+          <div className="relative flex-shrink-0 flex items-end justify-center md:justify-start">
+            <img
+              src={driverImage}
+              alt={`${Driver.givenName} ${Driver.familyName}`}
+              className="w-64 h-72 md:w-72 md:h-80 object-cover object-top"
+            />
+          </div>
+
+          {/* Info */}
+          <div className="flex-1 p-6 md:p-8 flex flex-col justify-center gap-5">
+            <div>
+              {/* Number + nationality */}
+              <div className="flex items-center gap-3 mb-2">
+                <span
+                  className="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border"
+                  style={{
+                    color: teamColor,
+                    borderColor: `${teamColor}40`,
+                    backgroundColor: `${teamColor}15`,
+                  }}
+                >
+                  P{position}
+                </span>
+                <span className="text-xs uppercase tracking-widest text-gray-500">
+                  {Driver.nationality}
+                </span>
+              </div>
+
+              {/* Name */}
+              <h1 className="text-4xl md:text-6xl font-black leading-none tracking-tight">
+                <span className="text-gray-400 font-bold">{Driver.givenName}</span>
+                <br />
+                <span className="text-white">{Driver.familyName}</span>
+              </h1>
+
+              {/* Team badge */}
+              <div className="flex items-center gap-2.5 mt-3">
+                {teamImg && (
+                  <img src={teamImg} alt={teamName} className="h-6 w-6 object-contain" />
+                )}
+                <span className="text-sm font-semibold" style={{ color: teamColor }}>
+                  {teamName}
+                </span>
+              </div>
+            </div>
+
+            {/* Stat cards */}
+            <div className="flex flex-wrap gap-3 mt-1">
+              <StatCard label="Points" value={points} color={teamColor} large />
+              <StatCard label="Races" value={racesCompleted} color={teamColor} />
+              {bestFinish !== null && bestFinish !== Infinity && (
+                <StatCard label="Best Finish" value={`P${bestFinish}`} color={teamColor} />
+              )}
+              {podiums > 0 && (
+                <StatCard label="Podiums" value={podiums} color={teamColor} />
+              )}
+            </div>
+          </div>
         </div>
       </div>
-      <div className="mt-10">
+
+      {/* Description */}
+      <div className="rounded-2xl bg-[#141414] border border-white/[0.07] p-6 mb-8">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="h-4 w-1 rounded-full" style={{ backgroundColor: teamColor }} />
+          <h2 className="text-xs uppercase tracking-widest font-bold text-gray-400">
+            Driver Overview
+          </h2>
+        </div>
+        <p className="text-[15px] leading-relaxed text-gray-300">{description}</p>
+      </div>
+
+      {/* Charts */}
+      <div>
         {loading ? (
-          <p className="flex space-x-2 justify-center">
-            <span className="animate-spin h-5 w-5 border-2 border-t-transparent border-white rounded-full"></span>
-            <span>Loading chart…</span>
-          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <SkeletonChart />
+            <SkeletonChart />
+          </div>
         ) : progression.length > 0 ? (
-          <div className="flex flex-col md:flex-row gap-8 justify-center items-start">
-            <div className="flex-1 min-w-[450px] md:min-w-[600px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="rounded-2xl bg-[#141414] border border-white/[0.07] p-5">
               <DriverPointsChart
                 data={progression}
                 driverName={`${Driver.givenName} ${Driver.familyName}`}
+                teamColor={teamColor}
               />
             </div>
-            <div className="flex-1 min-w-[450px] md:min-w-[600px]">
+            <div className="rounded-2xl bg-[#141414] border border-white/[0.07] p-5">
               <DriverPlacementChart
                 data={placementProgression}
                 driverName={`${Driver.givenName} ${Driver.familyName}`}
+                teamColor={teamColor}
               />
             </div>
           </div>
         ) : (
-          <p>No race data available.</p>
+          <div className="rounded-2xl bg-[#141414] border border-white/[0.07] p-12 text-center">
+            <p className="text-gray-500 text-sm">No race data available yet.</p>
+          </div>
         )}
       </div>
+    </div>
+  );
+};
+
+function StatCard({
+  label,
+  value,
+  color,
+  large,
+}: {
+  label: string;
+  value: string | number;
+  color: string;
+  large?: boolean;
+}) {
+  return (
+    <div
+      className="rounded-xl border px-4 py-3 min-w-[80px]"
+      style={{
+        borderColor: `${color}20`,
+        backgroundColor: `${color}08`,
+      }}
+    >
+      <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-0.5">{label}</p>
+      <p
+        className={`font-black ${large ? "text-3xl" : "text-xl"}`}
+        style={{ color }}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function SkeletonChart() {
+  return (
+    <div className="rounded-2xl bg-[#141414] border border-white/[0.07] p-5">
+      <div className="h-5 w-40 bg-white/5 rounded mb-4 animate-pulse" />
+      <div className="h-[300px] bg-white/[0.02] rounded-xl animate-pulse" />
     </div>
   );
 }

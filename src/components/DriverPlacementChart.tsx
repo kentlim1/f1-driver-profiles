@@ -7,7 +7,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Label,
 } from "recharts";
 
 type PlacementRow = {
@@ -20,46 +19,36 @@ type PlacementRow = {
 type Props = {
   data: PlacementRow[];
   driverName: string;
+  teamColor?: string;
 };
 
 const CustomTooltip = ({
   active,
   payload,
+  teamColor,
 }: {
   active?: boolean;
   payload?: any;
+  teamColor: string;
 }) => {
   if (active && payload && payload.length) {
     const row = payload[0].payload;
     return (
-      <div
-        style={{
-          background: "#242424",
-          borderRadius: 8,
-          padding: 10,
-          color: "#fff",
-        }}
-      >
-        <div>
-          <strong>
-            Round {row.round}: {row.race}
-          </strong>
-        </div>
-        <div>
+      <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-3 py-2.5 shadow-xl text-sm">
+        <p className="font-bold text-white mb-1">
+          Round {row.round}: {row.race}
+        </p>
+        <p className="text-gray-400">
           {row.status ? (
-            <span>
-              Status: <strong>{row.status}</strong>
-            </span>
+            <>Status: <span className="font-bold text-amber-400">{row.status}</span></>
           ) : (
-            <span>
-              Position: <strong>P{row.position}</strong>
-            </span>
+            <>Position: <span className="font-bold" style={{ color: teamColor }}>P{row.position}</span></>
           )}
-        </div>
+        </p>
         {row.points !== undefined && (
-          <div>
-            Points: <strong>{row.points}</strong>
-          </div>
+          <p className="text-gray-400">
+            Points: <span className="font-bold text-white">{row.points}</span>
+          </p>
         )}
       </div>
     );
@@ -67,39 +56,40 @@ const CustomTooltip = ({
   return null;
 };
 
-const DriverPlacementChart: React.FC<Props> = ({ data }) => {
+const DriverPlacementChart: React.FC<Props> = ({ data, teamColor = "#36a2ff" }) => {
   return (
-    <div className="bg-[#242424] p-4 rounded-2xl shadow-xl/70 hover:scale-[1.02] transition-transform duration-300">
-      <h2 className="text-xl font-bold mb-4 text-white text-center">
-        Race Finishing Positions
-      </h2>
+    <div>
+      <div className="flex items-center gap-2 mb-4">
+        <div className="h-4 w-1 rounded-full" style={{ backgroundColor: teamColor }} />
+        <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider">
+          Race Finishing Positions
+        </h2>
+      </div>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#555" />
-          <XAxis dataKey="round" stroke="#ccc">
-            <Label value="Round" offset={-5} position="insideBottom" fill="#ccc" />
-          </XAxis>
+          <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
+          <XAxis
+            dataKey="round"
+            stroke="#555"
+            tick={{ fill: "#666", fontSize: 11 }}
+            axisLine={{ stroke: "#ffffff10" }}
+          />
           <YAxis
-            stroke="#ccc"
+            stroke="#555"
+            tick={{ fill: "#666", fontSize: 11 }}
+            axisLine={{ stroke: "#ffffff10" }}
             domain={[1, "dataMax + 2"]}
             reversed
             allowDecimals={false}
-          >
-            <Label
-              value="Placement"
-              angle={-90}
-              position="insideLeft"
-              style={{ textAnchor: "middle" }}
-              fill="#ccc"
-            />
-          </YAxis>
-          <Tooltip content={<CustomTooltip />} />
+          />
+          <Tooltip content={<CustomTooltip teamColor={teamColor} />} />
           <Line
             type="monotone"
             dataKey="position"
-            stroke="#36a2ff"
-            strokeWidth={2}
-            dot={{ r: 3 }}
+            stroke={teamColor}
+            strokeWidth={2.5}
+            dot={{ r: 3, fill: teamColor, strokeWidth: 0 }}
+            activeDot={{ r: 5, fill: teamColor, stroke: "#fff", strokeWidth: 2 }}
           />
         </LineChart>
       </ResponsiveContainer>

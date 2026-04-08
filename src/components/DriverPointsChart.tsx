@@ -7,7 +7,8 @@ import {
   Tooltip,
   CartesianGrid,
   ResponsiveContainer,
-  Label,
+  Area,
+  AreaChart,
 } from "recharts";
 
 type ChartRow = {
@@ -19,35 +20,29 @@ type ChartRow = {
 type Props = {
   data: ChartRow[];
   driverName: string;
+  teamColor?: string;
 };
 
 const CustomTooltip = ({
   active,
   payload,
+  teamColor,
 }: {
   active?: boolean;
   payload?: any;
+  teamColor: string;
 }) => {
   if (active && payload && payload.length) {
     const row = payload[0].payload;
     return (
-      <div
-        style={{
-          background: "#242424",
-          borderRadius: 8,
-          padding: 10,
-          color: "#fff",
-        }}
-      >
-        <div>
-          <strong>
-            Round {row.round}: {row.race}
-          </strong>
-        </div>
+      <div className="rounded-lg border border-white/10 bg-[#1a1a1a] px-3 py-2.5 shadow-xl text-sm">
+        <p className="font-bold text-white mb-1">
+          Round {row.round}: {row.race}
+        </p>
         {row.points !== undefined && (
-          <div>
-            Points: <strong>{row.points}</strong>
-          </div>
+          <p className="text-gray-400">
+            Points: <span className="font-bold" style={{ color: teamColor }}>{row.points}</span>
+          </p>
         )}
       </div>
     );
@@ -55,36 +50,46 @@ const CustomTooltip = ({
   return null;
 };
 
-const DriverPointsChart: React.FC<Props> = ({ data }) => {
+const DriverPointsChart: React.FC<Props> = ({ data, teamColor = "#ff4136" }) => {
   return (
-    <div className="bg-[#242424] p-4 rounded-2xl shadow-xl/70 hover:scale-[1.02] transition-transform duration-300">
-      <h2 className="text-xl font-bold mb-4 text-white text-center">
-        Points Progression
-      </h2>
+    <div>
+      <div className="flex items-center gap-2 mb-4">
+        <div className="h-4 w-1 rounded-full" style={{ backgroundColor: teamColor }} />
+        <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider">
+          Points Progression
+        </h2>
+      </div>
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data} >
-          <CartesianGrid strokeDasharray="3 3" stroke="#555" />
-          <XAxis dataKey="round" stroke="#ccc">
-            <Label value="Round" offset={-5} position="insideBottom" fill="#ccc" />
-          </XAxis>
-          <YAxis stroke="#ccc">
-            <Label
-              value="Points"
-              angle={-90}
-              position="insideLeft"
-              style={{ textAnchor: "middle" }}
-              fill="#ccc"
-            />
-          </YAxis>
-          <Tooltip content={<CustomTooltip />} />
-          <Line
+        <AreaChart data={data}>
+          <defs>
+            <linearGradient id="pointsGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={teamColor} stopOpacity={0.3} />
+              <stop offset="100%" stopColor={teamColor} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
+          <XAxis
+            dataKey="round"
+            stroke="#555"
+            tick={{ fill: "#666", fontSize: 11 }}
+            axisLine={{ stroke: "#ffffff10" }}
+          />
+          <YAxis
+            stroke="#555"
+            tick={{ fill: "#666", fontSize: 11 }}
+            axisLine={{ stroke: "#ffffff10" }}
+          />
+          <Tooltip content={<CustomTooltip teamColor={teamColor} />} />
+          <Area
             type="monotone"
             dataKey="points"
-            stroke="#ff4136"
-            strokeWidth={2}
-            dot={{ r: 3 }}
+            stroke={teamColor}
+            strokeWidth={2.5}
+            fill="url(#pointsGradient)"
+            dot={{ r: 3, fill: teamColor, strokeWidth: 0 }}
+            activeDot={{ r: 5, fill: teamColor, stroke: "#fff", strokeWidth: 2 }}
           />
-        </LineChart>
+        </AreaChart>
       </ResponsiveContainer>
     </div>
   );

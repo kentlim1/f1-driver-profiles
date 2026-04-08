@@ -1,159 +1,84 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import type { DriverStanding } from "../api";
-import { Link } from "react-router-dom";
-
-// import driver images
-import verstappenImg from "../assets/drivers/verstappen.png";
-import hamiltonImg from "../assets/drivers/hamilton.png";
-import tsunodaImg from "../assets/drivers/tsunoda.png";
-import lawsonImg from "../assets/drivers/lawson.png";
-import leclercImg from "../assets/drivers/leclerc.png";
-import norrisImg from "../assets/drivers/norris.png";
-import piastriImg from "../assets/drivers/piastri.png";
-import albonImg from "../assets/drivers/albon.png";
-import sainzImg from "../assets/drivers/sainz.png";
-import russellImg from "../assets/drivers/russell.png";
-import antonelliImg from "../assets/drivers/antonelli.png";
-import hadjarImg from "../assets/drivers/hadjar.png";
-import bortoletoImg from "../assets/drivers/bortoleto.png";
-import hulkenbergImg from "../assets/drivers/hulkenberg.png";
-import gaslyImg from "../assets/drivers/gasly.png";
-import colapintoImg from "../assets/drivers/colapinto.png";
-import alonsoImg from "../assets/drivers/alonso.png";
-import strollImg from "../assets/drivers/stroll.png";
-import oconImg from "../assets/drivers/ocon.png";
-import bearmanImg from "../assets/drivers/bearman.png";
-import lindbladImg from "../assets/drivers/lindblad.png";
-import perezImg from "../assets/drivers/perez.png";
-import bottasImg from "../assets/drivers/bottas.png";
-
-
-// import team images
-import mclarenImg from "../assets/teams/mclaren.png";
-import ferrariImg from "../assets/teams/ferrari.png";
-import mercedesImg from "../assets/teams/mercedes.png";
-import redbullImg from "../assets/teams/red-bull.png";
-import williamsImg from "../assets/teams/williams.png";
-import rbImg from "../assets/teams/rb.png";
-import astonmartinImg from "../assets/teams/aston-martin.png";
-import haasImg from "../assets/teams/haas.png";
-import audiImg from "../assets/teams/audi.png";
-import alpineImg from "../assets/teams/alpine.png";
-import cadillacImg from "../assets/teams/cadillac.png"
-
-// driver image map
-const driverImages: Record<string, string> = {
-  max_verstappen: verstappenImg,
-  hamilton: hamiltonImg,
-  tsunoda: tsunodaImg,
-  lawson: lawsonImg,
-  leclerc: leclercImg,
-  norris: norrisImg,
-  piastri: piastriImg,
-  albon: albonImg,
-  sainz: sainzImg,
-  russell: russellImg,
-  antonelli: antonelliImg,
-  hadjar: hadjarImg,
-  bortoleto: bortoletoImg,
-  hulkenberg: hulkenbergImg,
-  gasly: gaslyImg,
-  colapinto: colapintoImg,
-  alonso: alonsoImg,
-  stroll: strollImg,
-  ocon: oconImg,
-  bearman: bearmanImg,
-  lindblad: lindbladImg,
-  arvid_lindblad: lindbladImg,
-  perez: perezImg,
-  bottas: bottasImg
-};
-
-// team image map
-const teamImages: Record<string, string> = {
-  mclaren: mclarenImg,
-  ferrari: ferrariImg,
-  mercedes: mercedesImg,
-  red_bull: redbullImg,
-  williams: williamsImg,
-  aston_martin: astonmartinImg,
-  rb: rbImg,
-  audi: audiImg,
-  haas: haasImg,
-  alpine: alpineImg,
-  cadillac: cadillacImg
-};
-
-const teamColors: Record<string, string> = {
-  "Red Bull": "border-blue-900",
-  "Ferrari": "border-red-600",
-  "McLaren": "border-orange-500",
-  "Mercedes": "border-teal-500",
-  "Aston Martin": "border-green-800",
-  "Williams": "border-blue-500",
-  "RB F1 Team": "border-indigo-600",
-  "Sauber": "border-green-500",
-  "Haas F1 Team": "border-gray-500",
-  "Alpine F1 Team": "border-pink-400",
-};
-
-// overrides (Yuki/Liam swap)
-const driverTeamOverride: Record<string, string> = {
-  tsunoda: "Red Bull",
-  lawson: "RB F1 Team",
-};
-
-const driverTeamOverrideId: Record<string, string> = {
-  tsunoda: "red_bull",
-  lawson: "rb",
-};
+import {
+  driverImages,
+  teamImages,
+  getTeamName,
+  getTeamColor,
+  getConstructorId,
+  positionColors,
+} from "../lib/constants";
 
 type Props = {
   standing: DriverStanding;
+  position: number;
 };
 
-const DriverCard: React.FC<Props> = ({ standing }) => {
+const DriverCard: React.FC<Props> = ({ standing, position }) => {
   const navigate = useNavigate();
   const driver = standing.Driver;
   const driverId = driver.driverId.toLowerCase();
   const driverImgSrc = driverImages[driverId];
-  const team = driverTeamOverride[driverId] || standing.Constructors[0]?.name;
-  const borderColorClass = teamColors[team];
-  const constructorId =
-    driverTeamOverrideId[driverId] || standing.Constructors[0]?.constructorId;
+  const team = getTeamName(driverId, standing.Constructors[0]?.name);
+  const constructorId = getConstructorId(driverId, standing.Constructors[0]?.constructorId);
   const teamImgSrc = teamImages[constructorId];
+  const teamColor = getTeamColor(team);
+  const posColor = positionColors[position] ?? "#6b7280";
 
   return (
     <div
       onClick={() => navigate(`/${driverId}`)}
-      className={`flex items-center justify-start border-4 ${borderColorClass} bg-[#242424] p-4 rounded-xl shadow-xl/40 w-full h-40 cursor-pointer hover:scale-105 transition-transform`}
+      className="group relative flex items-center gap-3 rounded-xl overflow-hidden bg-[#141414] border border-white/[0.07] cursor-pointer hover:border-white/15 transition-all duration-200 hover:shadow-lg"
+      style={{
+        boxShadow: `inset 3px 0 0 ${teamColor}`,
+      }}
     >
-      <Link to={`/driver/${driver.driverId}`}></Link>
-      <div className="flex items-center">
+      {/* Driver image */}
+      <div className="flex-shrink-0 relative overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{ background: `linear-gradient(135deg, ${teamColor}, transparent)` }}
+        />
         <img
           src={driverImgSrc}
           alt={driver.familyName}
-          className="w-40 h-40 object-cover object-top border-gray-500"
+          className="w-20 h-20 object-cover object-top group-hover:scale-105 transition-transform duration-300"
         />
-        <div className="flex items-center ml-4 space-x-4">
-          <div className="text-left text-white">
-            <p className="text-xl font-bold">
-              {driver.givenName} {driver.familyName}
-            </p>
-            <p className="text-med text-gray-200">{team}</p>
-          </div>
+      </div>
+
+      {/* Info */}
+      <div className="flex-1 min-w-0 py-2">
+        <div className="flex items-center gap-2">
+          <span
+            className="text-xs font-black tabular-nums"
+            style={{ color: posColor }}
+          >
+            P{position}
+          </span>
+          <span className="text-sm font-bold text-white truncate">
+            {driver.givenName} <span className="font-black">{driver.familyName}</span>
+          </span>
+        </div>
+        <p className="text-xs font-medium mt-0.5 truncate" style={{ color: teamColor }}>
+          {team}
+        </p>
+      </div>
+
+      {/* Right side: team logo + points */}
+      <div className="flex items-center gap-3 pr-3 flex-shrink-0">
+        {teamImgSrc && (
           <img
             src={teamImgSrc}
             alt={team}
-            className="w-20 h-20 object-contain scale-80"
+            className="w-7 h-7 object-contain opacity-30 group-hover:opacity-60 transition-opacity hidden sm:block"
           />
+        )}
+        <div className="text-right">
+          <span className="text-lg font-black text-white tabular-nums">{standing.points}</span>
+          <p className="text-[10px] text-gray-600 uppercase tracking-wider">pts</p>
         </div>
       </div>
-      <div className="text-right text-white p-10 ml-auto">
-        <p className="text-lg font-bold">{standing.points} pts</p>
-      </div>
-      <Link to={`/driver/${driver.driverId}`}></Link>
     </div>
   );
 };
