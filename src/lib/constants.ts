@@ -118,3 +118,26 @@ export function getTeamColor(teamName: string): string {
 export function getConstructorId(driverId: string, constructorId: string): string {
   return driverTeamOverrideId[driverId] || constructorId;
 }
+
+const nationalityToCode: Record<string, string> = {
+  Dutch: "NL",
+  British: "GB",
+  Spanish: "ES",
+  Mexican: "MX",
+  Monegasque: "MC",
+  Australian: "AU",
+  Finnish: "FI",
+  Canadian: "CA",
+  French: "FR",
+  German: "DE",
+  Thai: "TH",
+  Italian: "IT",
+  Brazilian: "BR",
+  Argentine: "AR",
+  "New Zealander": "NZ",
+};
+
+export function getNationalityFlagUrl(nationality: string): string | null {
+  const code = nationalityToCode[nationality];
+  return code ? `https://flagcdn.com/w40/${code.toLowerCase()}.png` : null;
+}

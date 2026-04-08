@@ -8,6 +8,7 @@ import {
   getTeamColor,
   getConstructorId,
   positionColors,
+  getNationalityFlagUrl,
 } from "../lib/constants";
 
 type Props = {
@@ -56,6 +57,9 @@ const DriverCard: React.FC<Props> = ({ standing, position }) => {
           >
             P{position}
           </span>
+          {getNationalityFlagUrl(driver.nationality) && (
+            <img src={getNationalityFlagUrl(driver.nationality)!} alt="" className="h-3 w-auto rounded-[2px]" />
+          )}
           <span className="text-sm font-bold text-white truncate">
             {driver.givenName} <span className="font-black">{driver.familyName}</span>
           </span>

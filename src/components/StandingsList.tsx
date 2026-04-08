@@ -8,6 +8,7 @@ import {
   getTeamName,
   getTeamColor,
   getConstructorId,
+  getNationalityFlagUrl,
 } from "../lib/constants";
 
 type Props = {
@@ -86,7 +87,10 @@ function PodiumCard({
 
         {/* Info overlay at top */}
         <div className="absolute top-10 left-0 right-0 px-3 text-center z-10">
-          <p className="text-[11px] font-medium uppercase tracking-wider text-gray-500">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-gray-500 flex items-center justify-center gap-1">
+            {getNationalityFlagUrl(standing.Driver.nationality) && (
+              <img src={getNationalityFlagUrl(standing.Driver.nationality)!} alt="" className="h-2.5 w-auto rounded-[1px]" />
+            )}
             {standing.Driver.givenName}
           </p>
           <p className="text-lg font-black text-white leading-tight">

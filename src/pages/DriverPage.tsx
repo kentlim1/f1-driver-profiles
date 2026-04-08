@@ -10,6 +10,7 @@ import {
   getTeamName,
   getTeamColor,
   getConstructorId,
+  getNationalityFlagUrl,
 } from "../lib/constants";
 
 type Props = {
@@ -202,7 +203,10 @@ const DriverPage: React.FC<Props> = ({ standings }) => {
                 >
                   P{position}
                 </span>
-                <span className="text-xs uppercase tracking-widest text-gray-500">
+                <span className="text-xs uppercase tracking-widest text-gray-500 flex items-center gap-1.5">
+                  {getNationalityFlagUrl(Driver.nationality) && (
+                    <img src={getNationalityFlagUrl(Driver.nationality)!} alt="" className="h-3 w-auto rounded-[2px]" />
+                  )}
                   {Driver.nationality}
                 </span>
               </div>
