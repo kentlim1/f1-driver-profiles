@@ -79,13 +79,13 @@ function PodiumCard({
             <img
               src={driverImg}
               alt={standing.Driver.familyName}
-              className="mx-auto h-44 w-44 object-cover object-top drop-shadow-2xl group-hover:scale-105 transition-transform duration-300"
+              className="mx-auto h-40 w-40 object-cover object-top drop-shadow-2xl group-hover:scale-105 transition-transform duration-300"
             />
           )}
         </div>
 
         {/* Info overlay at top */}
-        <div className="absolute top-12 left-0 right-0 px-3 text-center">
+        <div className="absolute top-10 left-0 right-0 px-3 text-center z-10">
           <p className="text-[11px] font-medium uppercase tracking-wider text-gray-500">
             {standing.Driver.givenName}
           </p>
